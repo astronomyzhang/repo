@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.siemens.dasheng.web.mapper.DaAppResourceUsageMapper" >
+  <resultMap id="BaseResultMap" type="com.siemens.dasheng.web.model.DaAppResourceUsage" >
+    <constructor >
+      <idArg column="id" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="objectid" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="objecttype" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="appid" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="ownappid" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="createdate" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="releasedate" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="release" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="consumerobject" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="consumerdescription" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="consumerobjectId" jdbcType="VARCHAR" javaType="java.lang.String" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, objectid, objecttype, appid, createdate, releasedate,
+    release, consumerobject, consumerdescription, consumerobjectId, ownappid
+  </sql>
+
+  <insert id="saveList" parameterType="java.util.List" >
+    insert into da_app_resource (
+    objectid, objecttype, appid, createdate, consumerobject, consumerdescription,consumerobjectId, ownappid
+    )
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.objectid,jdbcType=VARCHAR}, #{item.objecttype,jdbcType=VARCHAR},#{item.appid,jdbcType=VARCHAR},
+      #{item.createdate,jdbcType=BIGINT},
+      #{item.consumerobject,jdbcType=VARCHAR},#{item.consumerdescription,jdbcType=VARCHAR},
+      #{item.consumerobjectId,jdbcType=VARCHAR},
+      #{item.ownappid,jdbcType=BIGINT}
+      )
+    </foreach>
+
+  </insert>
+
+  <delete id="releaseResource">
+    delete from da_app_resource where consumerobjectId = #{consumerobjectId}
+    and objectid = #{objectId} and appid = #{appId} and objecttype = #{objectType}
+
+  </delete>
+
+  <select id="queryUseResource"  resultType="com.siemens.dasheng.web.model.DaAppResourceUsage">
+    select * from da_app_resource
+    where consumerobjectId = #{consumerobjectId}
+    and objectid = #{objectId} and appid = #{appId} and objecttype = #{objectType}
+
+  </select>
+
+  <select id="queryUseResourceList"  resultType="com.siemens.dasheng.web.model.DaAppResourceUsage">
+    select * from da_app_resource
+    where consumerobjectId = #{consumerobjectId}
+    and objectid in
+    (<foreach collection="objectIds" item="objectId" index="index" separator=",">
+     #{objectId}
+     </foreach>)
+     and appid = #{appId} and objecttype = #{objectType}
+
+  </select>
+
+  <select id="queryUseResourceByConnection"  resultType="com.siemens.dasheng.web.model.DaAppResourceUsage">
+    select * from da_app_resource
+    where 1=1
+    and objectid = #{objectId} and appid = #{appId} and objecttype = #{objectType}
+
+  </select>
+
+  <select id="queryUseResourceBySensorOrGroup"  resultType="com.siemens.dasheng.web.model.DaAppResourceUsage">
+    select * from da_app_resource
+    where 1=1
+    and objectid = #{objectId} and objecttype = #{objectType}
+  </select>
+
+  <select id="queryUseResourcesBySensorOrGroup"  resultType="com.siemens.dasheng.web.model.DaAppResourceUsage">
+    select * from da_app_resource
+    where 1=1
+    and objecttype = #{objectType}
+    and objectid in
+    (<foreach collection="objectIds" item="objectId" index="index" separator=",">
+    #{objectId}
+  </foreach>)
+  </select>
+
+  <select id="queryUseResourcesBySensorOrGroupOrAppId"  resultType="com.siemens.dasheng.web.model.DaAppResourceUsage">
+    select * from da_app_resource
+    where 1=1
+    and objecttype = #{objectType}
+    and appid = #{appId}
+    and objectid in
+    (<foreach collection="objectIds" item="objectId" index="index" separator=",">
+    #{objectId}
+  </foreach>)
+  </select>
+
+</mapper>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.siemens.dasheng.web.mapper.DaConfigAppProviderMapper" >
+  <resultMap id="BaseResultMap" type="com.siemens.dasheng.web.model.DaConfigAppProvider" >
+    <constructor >
+      <idArg column="id" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="app_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="provider_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+    </constructor>
+  </resultMap>
+
+  <select id="selectByAppIds" resultType="com.siemens.dasheng.web.model.DaConfigAppProvider">
+    select id,app_id as appId,provider_id as providerId from da_config_app_provider
+    where app_id in
+    (<foreach collection="appIds" item="appId" index="index" separator=",">
+    #{appId}
+  </foreach>)
+  </select>
+
+  <select id="selectByProIds" resultType="com.siemens.dasheng.web.model.DaConfigAppProvider">
+    select id,app_id as appId,provider_id as providerId from da_config_app_provider
+    where provider_id in
+    (<foreach collection="proIdList" item="proId" index="index" separator=",">
+    #{proId}
+  </foreach>)
+  </select>
+
+
+    <select  id="getAppProviderMap" resultType="com.siemens.dasheng.web.model.DaAppProviderMap">
+       select app_id as appId,count(provider_id) as num from da_config_app_provider where 1=1  and (${appIds}) group by app_id
+    </select>
+
+  <insert id="saveList" parameterType="java.util.List" >
+    insert into da_config_app_provider (
+    id, app_id, provider_id
+    )
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.id,jdbcType=BIGINT},  #{item.appId,jdbcType=BIGINT}, #{item.providerId,jdbcType=BIGINT})
+    </foreach>
+
+  </insert>
+
+  <insert id="saveListOracle" parameterType="java.util.List" >
+    insert all
+    <foreach collection="list" item="item" index="index" separator=" ">
+      into da_config_app_provider values (#{item.id,jdbcType=BIGINT},  #{item.appId,jdbcType=BIGINT}, #{item.providerId,jdbcType=BIGINT})
+    </foreach>
+    select 1 from dual
+  </insert>
+
+  <delete id="deleteByAppIdAndProviderId">
+    delete from da_config_app_provider where app_id = #{appId}
+    and (${providerIds})
+
+  </delete>
+
+  <select id="selectByProIdsAndAppId" resultType="com.siemens.dasheng.web.model.DaConfigAppProvider">
+    select id,app_id as appId,provider_id as providerId from da_config_app_provider
+    where provider_id in
+    (<foreach collection="proIdList" item="proId" index="index" separator=",">
+    #{proId}
+  </foreach>)
+    and app_id != #{appId}
+  </select>
+</mapper>

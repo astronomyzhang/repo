@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.siemens.dasheng.web.mapper.DaConfigProviderMapper">
+    <resultMap id="BaseResultMap" type="com.siemens.dasheng.web.model.DaConfigProvider">
+        <constructor>
+            <idArg column="id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="name" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="data_type" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="connector_type" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="connector_class" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="description" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="updated_by" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="update_date" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="availability" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="availability_rate" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="status" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="sensormapping_update_time" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        </constructor>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, name, data_type, connector_type, connector_class, description, updated_by, update_date,availability,availability_rate,status,sensormapping_update_time
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from da_config_provider
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from da_config_provider
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.siemens.dasheng.web.model.DaConfigProvider">
+    insert into da_config_provider (id, name, data_type, 
+      connector_type, connector_class, description, 
+      updated_by, update_date,availability,availability_rate,status,sensormapping_update_time)
+    values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{dataType,jdbcType=VARCHAR}, 
+      #{connectorType,jdbcType=VARCHAR}, #{connectorClass,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
+      #{updatedBy,jdbcType=VARCHAR}, #{updateDate,jdbcType=BIGINT},#{availability,jdbcType=BIGINT},#{availabilityRate,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{sensormappingUpdateTime,jdbcType=BIGINT})
+  </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.siemens.dasheng.web.model.DaConfigProvider">
+        update da_config_provider
+        <set>
+            <if test="record.name != null">
+                name = #{record.name},
+            </if>
+            <if test="record.description != null">
+                description = #{record.description},
+            </if>
+            <if test="record.availability != null">
+                availability = #{record.availability},
+            </if>
+            <if test="record.status != null">
+                status = #{record.status},
+            </if>
+            <if test="record.sensormappingUpdateTime != null">
+                sensormapping_update_time = #{record.sensormappingUpdateTime},
+            </if>
+        </set>
+        where id = #{record.id,jdbcType=BIGINT}
+    </update>
+
+    <select id="queryListByCondition" resultMap="BaseResultMap">
+        select * from da_config_provider
+        where 1=1
+        <if test="params.connectorType != null and params.connectorType != ''">
+            and connector_type = #{params.connectorType}
+        </if>
+        <if test="params.connectorClass != null and params.connectorClass != ''">
+            and connector_class = #{params.connectorClass}
+        </if>
+        <if test="params.status != null and params.status != ''">
+            and status = #{params.status}
+        </if>
+        <if test="params.searchContent != null and params.searchContent != ''">
+            and (upper(name) like ('%'||upper(#{params.searchContent})||'%') escape '/' or upper(description) like
+            ('%'||upper(#{params.searchContent})||'%') escape '/')
+        </if>
+        ORDER BY id DESC
+    </select>
+
+    <select id="queryById" resultMap="BaseResultMap">
+    select * from da_config_provider where id = #{id}
+  </select>
+
+    <select id="selectByIds" resultMap="BaseResultMap">
+    select * from da_config_provider where id in
+        (<foreach collection="providerIds" item="providerId" index="index" separator=",">
+        #{providerId}
+    </foreach >)
+  </select>
+
+    <select id="selectByIdsAndStatus" resultMap="BaseResultMap">
+        select * from da_config_provider where id in
+        (<foreach collection="providerIds" item="providerId" index="index" separator=",">
+        #{providerId}
+    </foreach >)
+        AND  status =  #{status}
+    </select>
+
+
+    <select id="multiQueryListByCondition" resultMap="BaseResultMap">
+        select * from da_config_provider
+        where 1=1
+        and status =1
+        <if test="connectorType != null and connectorType != ''">
+            and connector_type = #{connectorType}
+        </if>
+        <if test="connectorClass != null and connectorClass != ''">
+            and (${connectorClass})
+        </if>
+        ORDER BY id DESC
+    </select>
+
+</mapper>

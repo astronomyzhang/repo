@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.siemens.dasheng.web.mapper.DaConfigApplicationMapper">
+    <resultMap id="BaseResultMap" type="com.siemens.dasheng.web.model.DaConfigApplication">
+        <constructor>
+            <idArg column="id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="ff_app_id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="type" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="register_date" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="register_user_id" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="sensormapping_update_time" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="global_app_id" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        </constructor>
+    </resultMap>
+
+    <select id="selectPublicAppList" resultType="com.siemens.dasheng.web.model.DaConfigApplication">
+        select id as id, ff_app_id as ffAppId, type as type
+        from da_config_application where 1=1
+        <if test="type != null">
+            and type = #{type}
+        </if>
+        <if test="id != null">
+            and id != #{id}
+        </if>
+
+    </select>
+
+    <select id="selectExistedAppId" resultType="com.siemens.dasheng.web.model.dto.ExistAppId">
+    select  ff_app_id as appId from da_config_application
+  </select>
+
+
+    <select id="selectByAppIds" resultMap="BaseResultMap">
+        select * from da_config_application where id in
+        (<foreach collection="appIds" item="appId" index="index" separator=",">
+        #{appId}
+    </foreach>)
+    </select>
+
+    <select id="selectByIdsAndType" resultMap="BaseResultMap">
+        select * from da_config_application where id in
+        (<foreach collection="appIds" item="appId" index="index" separator=",">
+        #{appId}
+    </foreach>)
+        AND type = #{type}
+    </select>
+
+    <select id="selectByAppId" resultType="com.siemens.dasheng.web.model.dto.ExistAppId">
+        select ff_app_id as appId from da_config_application where 1=1
+        <if test="appId != null">
+            and ff_app_id = #{appId}
+        </if>
+    </select>
+
+    <select id="selectByAppIdAndId" resultType="com.siemens.dasheng.web.model.dto.ExistAppId">
+        select ff_app_id as appId from da_config_application where 1=1
+        <if test="appId != null">
+            and ff_app_id = #{appId}
+        </if>
+        <if test="id != null">
+            and id != #{id}
+        </if>
+
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+    select * from da_config_application where id = #{id}
+  </select>
+
+
+    <update id="updateByPrimaryKey" parameterType="com.siemens.dasheng.web.model.DaConfigApplication">
+    update da_config_application
+    set type = #{type,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+    <update id="updateSensorMappingUpdateTimeByPrimaryKey"
+            parameterType="com.siemens.dasheng.web.model.DaConfigApplication">
+    update da_config_application
+    set sensormapping_update_time = #{sensormappingUpdateTime,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+    <select id="selectDaConnectorStatusListByFleetFrameAppIdList"
+            resultType="com.siemens.dasheng.web.model.dto.DaConnectorStatus">
+        select connector.id,connector.status,connector.name,dacc.name as connectApproach from
+        client_app ffapp,da_config_application daapp,da_config_app_provider
+        appProvider,
+        da_config_provider_connector providerConnector,da_config_connector connector,
+        da_config_category dacc
+        where ffapp.appid in
+        (<foreach collection="appIds" item="appId" index="index" separator=",">
+        #{appId}
+    </foreach>)
+        and ffapp.id = daapp.ff_app_id and daapp.id = appProvider.app_id and
+        appProvider.provider_id = providerConnector.provider_id and providerConnector.connector_id = connector.id
+        and dacc.id = connector.connect_approach
+    </select>
+
+
+
+    <select id="selectByFleetAppId"  resultType="com.siemens.dasheng.web.model.DaConfigApplication">
+        select * from da_config_application where 1=1
+        <if test="appId != null">
+            and global_app_id = #{appId}
+        </if>
+    </select>
+
+</mapper>

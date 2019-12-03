@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.siemens.dasheng.web.mapper.DaConfigConnectorSensorMapper">
+    <resultMap id="BaseResultMap" type="com.siemens.dasheng.web.model.DaConfigConnectorSensor">
+        <constructor>
+            <idArg column="id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="connector_info" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="tag" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="status" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="unit" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="connector_id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        </constructor>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, connector_info, tag, status, unit, connector_id
+  </sql>
+
+    <!--<delete id="deleteConSensorByCondition">
+      delete da_config_connector_sensor  where connector_info = #{connectorInfo} and
+      tag in
+      (<foreach collection="tagList" item="tag" index="index" separator=",">
+      #{tag}
+      </foreach>)
+    </delete>-->
+
+    <update id="updateStatusToDelByCondition">
+        update da_config_connector_sensor set status = 2 where connector_id = #{connectorId} and
+        tag in
+        (<foreach collection="tagList" item="tag" index="index" separator=",">
+        #{tag}
+    </foreach>)
+        and tag in (select distinct(tag) from da_config_sensor where connector_id = #{connectorId})
+    </update>
+
+    <update id="updateStatusToExistByCondition">
+        update da_config_connector_sensor set status = 0 where connector_id = #{connectorId} and
+        tag in
+        (<foreach collection="tagList" item="tag" index="index" separator=",">
+        #{tag}
+    </foreach>)
+    </update>
+
+    <delete id="deleteUnImportTagByTagList">
+        delete from da_config_connector_sensor where connector_id = #{connectorId} and
+        tag in
+        (<foreach collection="tagList" item="tag" index="index" separator=",">
+        #{tag}
+    </foreach>)
+        and tag not in (select distinct(tag) from da_config_sensor where connector_id = #{connectorId})
+    </delete>
+
+    <update id="updateStatusImportedByIds">
+        update da_config_connector_sensor set status = 1 where
+        id in
+        (<foreach collection="ids" item="id" index="index" separator=",">
+        #{id}
+    </foreach>)
+    </update>
+
+    <insert id="saveListOracle" parameterType="java.util.List">
+        INSERT INTO da_config_connector_sensor(id,connector_info,tag,connector_id,status,unit,da_prefix,hda_prefix)
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (SELECT #{item.id,jdbcType=BIGINT}, #{item.connectorInfo,jdbcType=VARCHAR},
+            #{item.tag,jdbcType=VARCHAR},#{item.connectorId,jdbcType=BIGINT},#{item.status,jdbcType=BIGINT},#{item.unit,jdbcType=VARCHAR},#{item.daPrefix,jdbcType=VARCHAR},#{item.hdaPrefix,jdbcType=VARCHAR} FROM DUAL)
+        </foreach>
+    </insert>
+
+    <select id="selectCountByCondition" resultType="int">
+        select count(*) from (
+        select case when s.status is null then 0 else s.status end as
+        status,s.id,s.connectorId,s.tag,s.connectorStatus,s.dbName,s.unit,s.description,s.connectorName from
+        (select a.id,a.connector_id as connectorId, a.tag ,a.status as tempStatus,b.status,c.status as
+        connectorStatus,c.db_name as dbName,a.unit,a.tag as description,c.name as connectorName,a.da_prefix as daPrefix,a.hda_prefix as hdaPrefix
+        from da_config_connector_sensor a
+        left join da_config_sensor b on b.connector_id = a.connector_id and b.tag = a.tag and b.app_id = #{appId}
+        left join da_config_connector c on c.id = a.connector_id
+        where a.connector_id in
+        (<foreach collection="connectorIds" item="connectorId" index="index" separator=",">
+        #{connectorId}
+    </foreach>) ) s where s.tempStatus =0 or s.tempStatus =1 or s.status is not null) xs
+        where 1=1
+        <if test="connectorStatus != null ">
+            and xs.connectorStatus = #{connectorStatus}
+        </if>
+        <if test="status != null ">
+            and xs.status = #{status}
+        </if>
+        <if test="searchContent != null and searchContent != ''">
+            and (upper(xs.tag) like ('%'||upper(#{searchContent})||'%') escape '/' or upper(xs.dbName) like
+            ('%'||upper(#{searchContent})||'%') escape '/')
+        </if>
+    </select>
+
+
+    <select id="selectListByConditionPG" resultType="com.siemens.dasheng.web.model.DaConfigConnectorSensorPlus">
+        select * from (
+        select case when s.status is null then 0 else s.status end as
+        status,s.id,s.connectorId,s.tag,s.connectorStatus,s.dbName,s.unit,s.description,s.connectorName from
+        (select a.id,a.connector_id as connectorId, a.tag ,a.status as tempStatus,b.status,c.status as
+        connectorStatus,c.db_name as dbName,a.unit,a.tag as description,c.name as connectorName,a.da_prefix as daPrefix,a.hda_prefix as hdaPrefix
+        from da_config_connector_sensor a
+        left join da_config_sensor b on b.connector_id = a.connector_id and b.tag = a.tag and b.app_id = #{appId}
+        left join da_config_connector c on c.id = a.connector_id
+        where a.connector_id in
+        (<foreach collection="connectorIds" item="connectorId" index="index" separator=",">
+        #{connectorId}
+    </foreach>) ) s where s.tempStatus =0 or s.tempStatus =1 or s.status is not null) xs
+        where 1=1
+        <if test="connectorStatus != null ">
+            and xs.connectorStatus = #{connectorStatus}
+        </if>
+        <if test="status != null ">
+            and xs.status = #{status}
+        </if>
+        <if test="searchContent != null and searchContent != ''">
+            and (upper(xs.tag) like ('%'||upper(#{searchContent})||'%') escape '/' or upper(xs.dbName) like
+            ('%'||upper(#{searchContent})||'%') escape '/')
+        </if>
+        order by xs.id desc
+        offset #{start} limit #{pageNum}
+    </select>
+
+
+    <select id="selectListByConditionORAC" resultType="com.siemens.dasheng.web.model.DaConfigConnectorSensorPlus">
+        select * from (select A.*,rownum rn from ( select * from (
+        select case when s.status is null then 0 else s.status end as
+        status,s.id,s.connectorId,s.tag,s.connectorStatus,s.dbName,s.unit,s.description,s.connectorName from
+        (select a.id,a.connector_id as connectorId, a.tag ,a.status as tempStatus,b.status,c.status as
+        connectorStatus,c.db_name as dbName,a.unit,a.tag as description,c.name as connectorName,a.da_prefix as daPrefix,a.hda_prefix as hdaPrefix
+        from da_config_connector_sensor a
+        left join da_config_sensor b on b.connector_id = a.connector_id and b.tag = a.tag and b.app_id = #{appId}
+        left join da_config_connector c on c.id = a.connector_id
+        where a.connector_id in
+        (<foreach collection="connectorIds" item="connectorId" index="index" separator=",">
+        #{connectorId}
+    </foreach>) ) s where s.tempStatus =0 or s.tempStatus =1 or s.status is not null) xs
+        where 1=1
+        <if test="connectorStatus != null ">
+            and xs.connectorStatus = #{connectorStatus}
+        </if>
+        <if test="status != null ">
+            and xs.status = #{status}
+        </if>
+        <if test="searchContent != null and searchContent != ''">
+            and (upper(xs.tag) like ('%'||upper(#{searchContent})||'%') escape '/' or upper(xs.dbName) like
+            ('%'||upper(#{searchContent})||'%') escape '/')
+        </if>
+        order by xs.id desc
+        ) A where rownum &lt;= #{pageNum}+#{start}) where rn > #{start}
+    </select>
+
+    <select id="selectByIds" resultType="com.siemens.dasheng.web.model.DaConfigConnectorSensorPlus">
+        select a.id,a.connector_id as connectorId, a.tag ,a.status,a.unit,a.da_prefix as daPrefix,a.hda_prefix as hdaPrefix from da_config_connector_sensor a
+        where a.id in
+        (<foreach collection="ids" item="id" index="index" separator=",">
+        #{id}
+    </foreach>)
+    </select>
+
+    <select id="selectListByConnectorId" resultType="com.siemens.dasheng.web.model.DaConfigConnectorSensorPlus">
+        select a.id,a.connector_id as connectorId, a.tag ,a.status,a.unit,a.da_prefix as daPrefix,a.hda_prefix as hdaPrefix from da_config_connector_sensor a
+        where a.connector_id = #{connectorId}
+    </select>
+
+    <select id="selectListByConnectorIdAndSiecode" resultType="com.siemens.dasheng.web.model.DaConfigConnectorSensorPlus">
+        select a.id,a.connector_id as connectorId, a.tag ,a.status,a.unit,a.da_prefix as daPrefix,a.hda_prefix as hdaPrefix from da_config_connector_sensor a
+        where a.connector_id = #{connectorId} and a.tag = #{tag}
+    </select>
+
+</mapper>

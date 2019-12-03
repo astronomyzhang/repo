@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.siemens.dasheng.web.mapper.DaConfigProviderConnectorMapper" >
+  <resultMap id="BaseResultMap" type="com.siemens.dasheng.web.model.DaConfigProviderConnector" >
+    <constructor >
+      <idArg column="id" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="connector_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="provider_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, connector_id, provider_id
+  </sql>
+
+  <insert id ="batchInsertOR" parameterType="java.lang.Integer" useGeneratedKeys="false">
+    insert into da_config_provider_connector
+    (id, connector_id, provider_id)
+    select DA_CONFIG_PROVIDER_CON$SEQ.nextval,a.* from (
+    <foreach collection="recordList" item="record" index="" separator="union all">
+      select
+      #{record.connectorId},
+      #{record.providerId}
+      from dual
+    </foreach >) a
+  </insert >
+
+  <insert id ="batchInsertPG" parameterType="java.lang.Integer" useGeneratedKeys="false">
+    insert into da_config_provider_connector
+    ( connector_id, provider_id)
+    values
+    <foreach collection="recordList" item="record" index="index" separator=",">
+      (
+      #{record.connectorId},
+      #{record.providerId}
+      )
+    </foreach >
+  </insert >
+
+  <select id="queryActiveProConList" resultType="com.siemens.dasheng.web.model.dto.DaCoreConnector" >
+    select
+    a.connector_id as connectorId,
+    a.provider_id as providerId,
+    b.name as name,
+    b.connect_approach as connectApproach,
+    b.connector_class as connectorClass,
+    b.archived_database as archivedDatabase,
+    b.server_host as serverHost,
+    b.port as port,
+    b.sqldas as sqldas,
+    b.user_name as userName,
+    b.password as password,
+    b.connect_timeout as connectTimeout,
+    b.command_timeout as commandTimeout,
+    b.reconnect_inteval as reconnectInteval,
+    b.reconnect_times as reconnectTimes,
+    b.status as status,
+    b.update_date as updateDate
+    from da_config_provider_connector a
+    left join da_config_connector b on b.id = a.connector_id
+    where a.provider_id in
+    (<foreach collection="providerIds" item="providerId" index="index" separator=",">
+    #{providerId}
+  </foreach >) and b.status = 1
+  </select>
+
+
+  <select id="selectByProIds" resultType="com.siemens.dasheng.web.model.DaConfigProviderConnector" >
+    select
+    connector_id as connectorId,
+    provider_id as providerId,
+    id
+
+    from da_config_provider_connector
+    where provider_id in
+    (<foreach collection="providerIds" item="providerId" index="index" separator=",">
+    #{providerId}
+  </foreach >)
+  </select>
+
+  <select id="selectActiveProviderByProIds" resultType="com.siemens.dasheng.web.model.DaConfigProviderConnector" >
+    select
+    a.connector_id as connectorId,
+    a.provider_id as providerId,
+    a.id
+    from da_config_provider_connector a
+    left join da_config_provider b on b.id = a.provider_id
+    where b.status = 1
+    and a.provider_id in
+    (<foreach collection="providerIds" item="providerId" index="index" separator=",">
+    #{providerId}
+  </foreach >)
+  </select>
+</mapper>

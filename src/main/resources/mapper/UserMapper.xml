@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.siemens.dasheng.web.mapper.UserMapper" >
+  <resultMap id="BaseResultMap" type="com.siemens.dasheng.web.model.Users" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="employeeNum" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="userName" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="passWd" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="department" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="trueName" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="post" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="sex" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="phone" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="email" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="userLevelId" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="parentId" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="reserve01" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="reserve02" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="reserve03" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="groupID" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="isDistributed" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="lv" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="SSOID" jdbcType="INTEGER" javaType="java.lang.Integer" />
+    </constructor>
+  </resultMap>
+
+
+    <select id="iTotalRecords" resultType="java.lang.Integer">
+        select count(u.id) from users u where u.id is NOT NULL and u.reserve01 !=3
+    </select>
+
+    <select id="iTotalDisplayRecords" resultType="java.lang.Integer">
+        select count(u.id) from users u where u.id is NOT NULL and u.reserve01 !=3
+        <if test="sSearch != '' and searchableArray != ''  ">
+            <bind name="s_Search" value="sSearch"/>
+            and
+            CONCAT(${searchableArray}) like CONCAT('%','${s_Search}','%')
+        </if>
+    </select>
+
+
+
+
+</mapper>

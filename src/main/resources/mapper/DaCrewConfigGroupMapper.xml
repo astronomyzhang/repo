@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.siemens.dasheng.web.mapper.DaCrewConfigGroupMapper" >
+  <resultMap id="BaseResultMap" type="com.siemens.dasheng.web.model.DaCrewConfigGroup" >
+    <constructor >
+      <idArg column="id" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="crew_id" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="group_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="app_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="power_plant_id" jdbcType="VARCHAR" javaType="java.lang.String" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, crew_id, group_id, app_id, power_plant_id
+  </sql>
+  <insert id="insert" parameterType="com.siemens.dasheng.web.model.DaCrewConfigGroup" >
+    insert into da_config_crew_group (id, crew_id, group_id, 
+      app_id, power_plant_id)
+    values (#{id,jdbcType=BIGINT}, #{crewId,jdbcType=VARCHAR}, #{groupId,jdbcType=BIGINT}, 
+      #{appId,jdbcType=BIGINT}, #{powerPlantId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.siemens.dasheng.web.model.DaCrewConfigGroup" >
+    insert into da_config_crew_group
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="crewId != null" >
+        crew_id,
+      </if>
+      <if test="groupId != null" >
+        group_id,
+      </if>
+      <if test="appId != null" >
+        app_id,
+      </if>
+      <if test="powerPlantId != null" >
+        power_plant_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="crewId != null" >
+        #{crewId,jdbcType=VARCHAR},
+      </if>
+      <if test="groupId != null" >
+        #{groupId,jdbcType=BIGINT},
+      </if>
+      <if test="appId != null" >
+        #{appId,jdbcType=BIGINT},
+      </if>
+      <if test="powerPlantId != null" >
+        #{powerPlantId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.siemens.dasheng.web.model.DaCrewConfigGroup" >
+    update da_config_crew_group
+    <set >
+      <if test="crewId != null" >
+        crew_id = #{crewId,jdbcType=VARCHAR},
+      </if>
+      <if test="groupId != null" >
+        group_id = #{groupId,jdbcType=BIGINT},
+      </if>
+      <if test="appId != null" >
+        app_id = #{appId,jdbcType=BIGINT},
+      </if>
+      <if test="powerPlantId != null" >
+        power_plant_id = #{powerPlantId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.siemens.dasheng.web.model.DaCrewConfigGroup" >
+    update da_config_crew_group
+    set crew_id = #{crewId,jdbcType=VARCHAR},
+      group_id = #{groupId,jdbcType=BIGINT},
+      app_id = #{appId,jdbcType=BIGINT},
+      power_plant_id = #{powerPlantId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="getSensorGroupMapping" resultType="com.siemens.dasheng.web.model.dto.SensorGroupMapping">
+    select b.id, c.name as crewName,  b.name as groupName , b.description, a.group_id as groupId,
+
+    (select count(d.sensor_code) from da_config_sensor_group d where d.group_id = b.id  ) as quantity
+    from da_config_crew_group a, da_config_group b , crew c
+    where a.group_id = b.id and a.crew_id = c.id
+    <if test="powerPlantId != '' and powerPlantId != null">
+      and a.power_plant_id = #{powerPlantId}
+    </if>
+    <if test="crewId != '' and crewId != null">
+      and c.id =  #{crewId}
+    </if>
+    <if test="searchStr != '' and searchStr != null">
+      and ( (lower(b.name) like '%'|| ('${searchStr}') || '%' )  or  (lower(b.description) like '%'|| ('${searchStr}') || '%' ))
+    </if>
+    order by c.name asc, b.name asc
+
+  </select>
+
+  <insert id="saveList" parameterType="java.util.List" >
+    insert into da_config_crew_group (
+    crew_id, group_id, app_id, power_plant_id
+    )
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.crewId,jdbcType=VARCHAR},  #{item.groupId,jdbcType=BIGINT}, #{item.appId,jdbcType=BIGINT}, #{item.powerPlantId,jdbcType=VARCHAR}
+      )
+    </foreach>
+
+  </insert>
+  <delete id="deleteByGroupId">
+        delete from da_config_crew_group where
+        crew_id = #{crewId}
+        and power_plant_id = #{powerPlantId}
+        and (${groupIds})
+
+  </delete>
+</mapper>

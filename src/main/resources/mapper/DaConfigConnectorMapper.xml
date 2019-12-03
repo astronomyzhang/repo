@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.siemens.dasheng.web.mapper.DaConfigConnectorMapper">
+    <resultMap id="BaseResultMap" type="com.siemens.dasheng.web.model.DaConfigConnector">
+        <constructor>
+            <idArg column="id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="name" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="data_type" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="connector_type" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="archived_database" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="connect_approach" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="description" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="server_host" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="port" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="sqldas" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="user_name" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="password" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="connect_timeout" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="command_timeout" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="reconnect_inteval" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="reconnect_times" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="status" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="connector_class" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="updated_by" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="update_date" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            <arg column="db_name" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="database" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="connector_info" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="url" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="da_server_name" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="hda_server_name" jdbcType="VARCHAR" javaType="java.lang.String"/>
+            <arg column="gateway" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        </constructor>
+    </resultMap>
+
+    <!--    <resultMap id="BaseResultMap2" type="com.siemens.dasheng.web.model.DaConfigProvider">
+            <constructor>
+                <idArg column="id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+                <arg column="name" jdbcType="VARCHAR" javaType="java.lang.String"/>
+                <arg column="data_type" jdbcType="VARCHAR" javaType="java.lang.String"/>
+                <arg column="connector_type" jdbcType="VARCHAR" javaType="java.lang.String"/>
+                <arg column="connector_class" jdbcType="VARCHAR" javaType="java.lang.String"/>
+                <arg column="description" jdbcType="VARCHAR" javaType="java.lang.String"/>
+                <arg column="updated_by" jdbcType="VARCHAR" javaType="java.lang.String"/>
+                <arg column="update_date" jdbcType="BIGINT" javaType="java.lang.Long"/>
+                <arg column="availability" jdbcType="BIGINT" javaType="java.lang.Long"/>
+                <arg column="availability_rate" jdbcType="VARCHAR" javaType="java.lang.String"/>
+                <arg column="status" jdbcType="BIGINT" javaType="java.lang.Long"/>
+            </constructor>
+        </resultMap>-->
+    <sql id="Base_Column_List">
+    id, name, data_type, connector_type, archived_database, connect_approach, description, 
+    server_host, port, sqldas, user_name, password, connect_timeout, command_timeout, 
+    reconnect_inteval, reconnect_times, status, connector_class, updated_by, update_date,db_name, database,
+    connector_info, url, da_server_name, hda_server_name, gateway
+  </sql>
+
+    <insert id="insert" parameterType="com.siemens.dasheng.web.model.DaConfigConnector">
+        insert into da_config_connector (id, name, data_type,
+        connector_type, archived_database, connect_approach,
+        description, server_host, port,
+        sqldas, user_name, password,
+        connect_timeout, command_timeout, reconnect_inteval,
+        reconnect_times, status, connector_class, updated_by, update_date,db_name,database,connector_info, url, da_server_name, hda_server_name, gateway
+        )
+        values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{dataType,jdbcType=VARCHAR},
+        #{connectorType,jdbcType=VARCHAR}, #{archivedDatabase,jdbcType=VARCHAR}, #{connectApproach,jdbcType=VARCHAR},
+        #{description,jdbcType=VARCHAR}, #{serverHost,jdbcType=VARCHAR}, #{port,jdbcType=VARCHAR},
+        #{sqldas,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
+        #{connectTimeout,jdbcType=BIGINT}, #{commandTimeout,jdbcType=BIGINT}, #{reconnectInteval,jdbcType=BIGINT},
+        #{reconnectTimes,jdbcType=BIGINT}, #{status,jdbcType=BIGINT}, #{connectorClass,jdbcType=VARCHAR},
+        #{updatedBy,jdbcType=VARCHAR}, #{updateDate,jdbcType=BIGINT},#{dbName,jdbcType=VARCHAR},#{database,jdbcType=VARCHAR},#{connectorInfo,jdbcType=VARCHAR},
+        #{url,jdbcType=VARCHAR},#{daServerName,jdbcType=VARCHAR},#{hdaServerName,jdbcType=VARCHAR},#{gateway,jdbcType=BIGINT}
+        )
+    </insert>
+
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.siemens.dasheng.web.model.DaConfigConnector">
+        update da_config_connector
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="dataType != null">
+                data_type = #{dataType,jdbcType=VARCHAR},
+            </if>
+            <if test="connectorType != null">
+                connector_type = #{connectorType,jdbcType=VARCHAR},
+            </if>
+            <if test="archivedDatabase != null">
+                archived_database = #{archivedDatabase,jdbcType=VARCHAR},
+            </if>
+            <if test="connectApproach != null">
+                connect_approach = #{connectApproach,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="serverHost != null">
+                server_host = #{serverHost,jdbcType=VARCHAR},
+            </if>
+            <if test="port != null">
+                port = #{port,jdbcType=VARCHAR},
+            </if>
+            <if test="sqldas != null">
+                sqldas = #{sqldas,jdbcType=VARCHAR},
+            </if>
+            <if test="userName != null">
+                user_name = #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="connectTimeout != null">
+                connect_timeout = #{connectTimeout,jdbcType=BIGINT},
+            </if>
+            <if test="commandTimeout != null">
+                command_timeout = #{commandTimeout,jdbcType=BIGINT},
+            </if>
+            <if test="reconnectInteval != null">
+                reconnect_inteval = #{reconnectInteval,jdbcType=BIGINT},
+            </if>
+            <if test="reconnectTimes != null">
+                reconnect_times = #{reconnectTimes,jdbcType=BIGINT},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=BIGINT},
+            </if>
+            <if test="connectorClass != null">
+                connector_class = #{connectorClass,jdbcType=VARCHAR},
+            </if>
+            <if test="updatedBy != null">
+                updated_by = #{updatedBy,jdbcType=VARCHAR},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate,jdbcType=BIGINT},
+            </if>
+            <if test="dbName != null">
+                db_name = #{dbName,jdbcType=VARCHAR},
+            </if>
+            <if test="database != null">
+                database = #{database,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.siemens.dasheng.web.model.DaConfigConnector">
+    update da_config_connector
+    set name = #{name,jdbcType=VARCHAR},
+      data_type = #{dataType,jdbcType=VARCHAR},
+      connector_type = #{connectorType,jdbcType=VARCHAR},
+      archived_database = #{archivedDatabase,jdbcType=VARCHAR},
+      connect_approach = #{connectApproach,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      server_host = #{serverHost,jdbcType=VARCHAR},
+      port = #{port,jdbcType=VARCHAR},
+      sqldas = #{sqldas,jdbcType=VARCHAR},
+      user_name = #{userName,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      connect_timeout = #{connectTimeout,jdbcType=BIGINT},
+      command_timeout = #{commandTimeout,jdbcType=BIGINT},
+      reconnect_inteval = #{reconnectInteval,jdbcType=BIGINT},
+      reconnect_times = #{reconnectTimes,jdbcType=BIGINT},
+      status = #{status,jdbcType=BIGINT},
+      connector_class = #{connectorClass,jdbcType=VARCHAR},
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=BIGINT},
+      db_name = #{dbName,jdbcType=VARCHAR},
+      database = #{database,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectConnectorsByIds" resultType="com.siemens.dasheng.web.model.DaConfigConnector">
+        select id,name,archived_database as archivedDatabase,connect_approach as connectApproach,data_type as
+        dataType,connector_type as connectorType,connector_class as connectorClass,connector_info as connectorInfo,status,
+        url, da_server_name as daServerName, hda_server_name as hdaServerName, gateway from
+        da_config_connector
+        where id in
+        (<foreach collection="connectorIds" item="connectorId" index="index" separator=",">
+        #{connectorId}
+    </foreach>)
+  </select>
+
+    <select id="selectConnectorsByIdsAsc" resultType="com.siemens.dasheng.web.model.DaConnectorConfig">
+        select a.id,a.name,a.data_type as dataType, a.connector_type as connectorType, a.archived_database as archivedDatabase,a.connect_approach as connectApproach,a.description,
+        a.server_host as serverHost, a.port,a.sqldas,a.user_name as userName,a.password,  a.connect_timeout as connectTimeout,a.command_timeout as commandTimeout,a.reconnect_inteval as reconnectInteval,
+        a.reconnect_times as reconnectTimes,a.status , a.connector_class as connectorClass,a.updated_by as updatedBy,a.update_date as updateDate,a.db_name as dbName,a.database,a.connector_info as connectorInfo,a.url, a.da_server_name as daServerName, a.hda_server_name as hdaServerName, a.gateway from
+        da_config_connector a
+        where a.id in
+        (<foreach collection="connectorIds" item="connectorId" index="index" separator=",">
+          #{connectorId}
+        </foreach>)
+        <if test = "connectorStatus != null">
+            and a.status = #{connectorStatus}
+        </if>
+        order by a.id asc
+    </select>
+
+  <select id="queryConnectorListByProviderId" resultType="com.siemens.dasheng.web.model.DaConfigConnector" parameterType="Long">
+    select a.id,a.name,a.data_type as dataType, a.connector_type as connectorType, a.archived_database as archivedDatabase,a.connect_approach as connectApproach,a.description,
+    a.server_host as serverHost, a.port,a.sqldas,a.user_name as userName,a.password,  a.connect_timeout as connectTimeout,a.command_timeout as commandTimeout,a.reconnect_inteval as reconnectInteval,
+    a.reconnect_times as reconnectTimes,a.status , a.connector_class as connectorClass,a.updated_by as updatedBy,a.update_date as updateDate,a.db_name as dbName,a.database,
+    a.connector_info as connectorInfo,a.url, a.da_server_name as daServerName, a.hda_server_name as hdaServerName, a.gateway
+
+     from da_config_connector a left join da_config_provider_connector b on b.connector_id = a.id
+    where b.provider_id = #{providerId}
+
+  </select>
+
+
+   <select id="queryConnectorListByProviderIds" resultType="com.siemens.dasheng.web.model.DaConfigConnectorPlus" parameterType="Long">
+    select a.id,a.name,a.data_type as dataType, a.connector_type as connectorType, a.archived_database as archivedDatabase,a.connect_approach as connectApproach,a.description,
+    a.server_host as serverHost, a.port,a.sqldas,a.user_name as userName,a.password,  a.connect_timeout as connectTimeout,a.command_timeout as commandTimeout,a.reconnect_inteval as reconnectInteval,
+    a.reconnect_times as reconnectTimes,a.status , a.connector_class as connectorClass,a.updated_by as updatedBy,a.update_date as updateDate,a.db_name as dbName,a.database,
+    a.connector_info as connectorInfo, b.provider_id as providerId,a.url, a.da_server_name as daServerName, a.hda_server_name as hdaServerName, a.gateway
+
+     from da_config_connector a left join da_config_provider_connector b on b.connector_id = a.id
+     where b.provider_id in
+    (<foreach collection="providerIds" item="providerId" index="index" separator=",">
+       #{providerId}
+    </foreach>)
+  </select>
+
+    <select id="queryConnectorReferencedProviders" resultType="com.siemens.dasheng.web.model.DaConfigProvider"
+            parameterType="long">
+    select t2.id, t2.name,t2.data_type as dataType,t2.connector_type as connectorType, t2.connector_class as connectorClass,
+    t2.description, t2.updated_by as updatedBy, t2.update_date as updateDate,t2.availability,
+    t2.availability_rate as availabilityRate, t2.status
+    from da_config_provider_connector t1 left join da_config_provider t2 on t1.provider_id = t2.id
+    where t1.connector_id = #{connectorID}
+  </select>
+
+    <!--根据id选出Connector-->
+    <select id="selectConnectorById" resultType="com.siemens.dasheng.web.model.DaConfigConnector" parameterType="long">
+        select
+        da_config_connector.id,
+        da_config_connector.name,
+        da_config_connector.data_type as dataType,
+        da_config_connector.archived_database as archivedDatabase,
+        da_config_connector.connect_approach as connectApproach,
+        da_config_connector.connector_type as connectorType,
+        da_config_connector.connector_class as connectorClass,
+        da_config_connector.updated_by as updatedBy,
+        da_config_connector.update_date as updateDate,
+        da_config_database.name as databaseName,
+        da_config_category.name as categoryName,
+        da_config_connector_type.name as connectorTypeName,
+        da_config_connector_class.name as connectorClassName,
+        da_config_connector.description,
+        da_config_connector.server_host as serverHost,
+        da_config_connector.port,
+        da_config_connector.sqldas,
+        da_config_connector.user_name as userName,
+        da_config_connector.password,
+        da_config_connector.status,
+        da_config_connector.connect_timeout as connectTimeout,
+        da_config_connector.command_timeout as commandTimeout,
+        da_config_connector.reconnect_inteval as reconnectInteval,
+        da_config_connector.reconnect_times as reconnectTimes,
+        da_config_connector.database as database,
+        da_config_connector.db_name as dbName,
+        da_config_connector.url,
+        da_config_connector.da_server_name as daServerName,
+        da_config_connector.hda_server_name as hdaServerName,
+        da_config_connector.gateway
+        from da_config_connector
+        left join da_config_database on da_config_connector.archived_database = da_config_database.id
+        left join da_config_connector_type on da_config_connector.connector_type = da_config_connector_type.id
+        left join da_config_connector_class on da_config_connector.connector_class = da_config_connector_class.id
+        left join da_config_category on da_config_connector.connect_approach = da_config_category.id
+        where da_config_connector.id =  #{connectorID}
+    </select>
+
+    <select id ="queryConnectors" resultType="com.siemens.dasheng.web.generalmodel.dataconnector.QueryConnectorResponse" >
+        select da.id,dac.name as databaseName,da.archived_database as archivedDatabase, da.connect_approach as approachId,dacc.name as approach,da.name,da.description,da.server_host as address,da.sqldas,da.port,da.status,da.db_name as dbName,da.database as database,
+        da.url, da.da_server_name as daServerName, da.hda_server_name as hdaServerName, da.gateway
+        from da_config_connector da
+        left join  da_config_database dac  on dac.id = da.archived_database
+        left join da_config_category dacc on dacc.id = da.connect_approach
+        where 1=1
+        <if test = "request.connectorType != null and request.connectorType != ''">
+            and da.connector_type = #{request.connectorType}
+        </if>
+        <if test = "request.connectorClass != null and request.connectorClass != ''">
+            and da.connector_class = #{request.connectorClass}
+        </if>
+        <if test = "request.category != null and request.category != ''">
+            and da.connect_approach = #{request.category}
+        </if>
+        <if test = "request.status != null and request.status != ''">
+            and da.status = #{request.status}
+        </if>
+        <if test = "request.searchStr != null and request.searchStr != ''">
+            and (upper(da.name) like  ('%'||upper(#{request.searchStr})||'%') escape '/' or upper(da.description) like ('%'||upper(#{request.searchStr})||'%') escape '/')
+        </if>
+        ORDER BY da.id DESC
+    </select >
+
+
+    <update id="batchUpdateStatusByPrimaryKey"  parameterType="com.siemens.dasheng.web.model.DaConfigConnector">
+
+        update da_config_connector
+        set  status=
+        <foreach collection="connectorList" item="item" index="index"
+                 separator=" " open="case ID" close="end">
+            when #{item.id} then #{item.status}
+        </foreach>
+        where id in
+        <foreach collection="connectorList" index="index" item="item"
+                 separator="," open="(" close=")">
+            #{item.id}
+        </foreach>
+
+    </update>
+
+
+</mapper>

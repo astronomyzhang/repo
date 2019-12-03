@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.siemens.dasheng.web.mapper.DaConfigAppExtensionMapper" >
+  <resultMap id="BaseResultMap" type="com.siemens.dasheng.web.model.DaConfigAppExtension" >
+    <constructor >
+      <idArg column="id" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="app_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+      <arg column="extension_app_id" jdbcType="BIGINT" javaType="java.lang.Long" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, app_id, extension_app_id
+  </sql>
+
+  <insert id="insert" parameterType="com.siemens.dasheng.web.model.DaConfigAppExtension" >
+    insert into da_config_app_extension (id, app_id, extension_app_id
+      )
+    values (#{id,jdbcType=BIGINT}, #{appId,jdbcType=BIGINT}, #{extensionAppId,jdbcType=BIGINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.siemens.dasheng.web.model.DaConfigAppExtension" >
+    insert into da_config_app_extension
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="appId != null" >
+        app_id,
+      </if>
+      <if test="extensionAppId != null" >
+        extension_app_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="appId != null" >
+        #{appId,jdbcType=BIGINT},
+      </if>
+      <if test="extensionAppId != null" >
+        #{extensionAppId,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.siemens.dasheng.web.model.DaConfigAppExtension" >
+    update da_config_app_extension
+    <set >
+      <if test="appId != null" >
+        app_id = #{appId,jdbcType=BIGINT},
+      </if>
+      <if test="extensionAppId != null" >
+        extension_app_id = #{extensionAppId,jdbcType=BIGINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.siemens.dasheng.web.model.DaConfigAppExtension" >
+    update da_config_app_extension
+    set app_id = #{appId,jdbcType=BIGINT},
+      extension_app_id = #{extensionAppId,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <insert id="saveList" parameterType="java.util.List" >
+  insert into da_config_app_extension (
+  id, app_id, extension_app_id
+  )
+  values
+  <foreach collection="list" item="item" index="index" separator=",">
+    (#{item.id,jdbcType=BIGINT},  #{item.appId,jdbcType=BIGINT}, #{item.extensionAppId,jdbcType=BIGINT}
+    )
+  </foreach>
+
+</insert>
+
+  <insert id="saveListOracle" parameterType="java.util.List" >
+
+    insert all
+    <foreach collection="list" item="item" index="index" separator=" ">
+      into da_config_app_extension values (#{item.id,jdbcType=BIGINT},  #{item.appId,jdbcType=BIGINT}, #{item.extensionAppId,jdbcType=BIGINT})
+    </foreach>
+    select 1 from dual
+
+  </insert>
+
+  <delete id="deleteByAppIdAndExtensionIds">
+   delete from da_config_app_extension where app_id = #{appId}
+    and (${extensionIds})
+
+  </delete>
+</mapper>

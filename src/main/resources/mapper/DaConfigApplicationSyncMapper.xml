@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.siemens.dasheng.web.mapper.DaConfigApplicationSyncMapper">
+
+
+    <!--根据globalAppId查询application-->
+    <select id="selectDaConfigApplicationByGlobalAppId" resultType="java.util.Map" parameterType="java.lang.String">
+        select id, ff_app_id, type, register_date, register_user_id, sensormapping_update_time,
+        global_app_id, app_version from da_config_application where global_app_id = #{globalAppId}
+    </select>
+
+    <!--根据appId查询测点-->
+    <select id="selectDaConfigSensorByAppId" resultType="java.util.Map" parameterType="java.lang.Long">
+        select siecode, connector_id, tag, app_id, status, description, unit, from_regist from da_config_sensor where app_id in
+        (select extension_app_id from da_config_app_extension where app_id = #{appId,jdbcType=BIGINT}
+        union all select #{appId,jdbcType=BIGINT} from dual)
+    </select>
+
+    <!--根据appId查询测点并按测点组分组-->
+    <select id="selectDaConfigSensorGroupByAppId" resultType="java.util.Map" parameterType="java.lang.Long">
+        select t3.*,t4.tag,t4.description as title,t4.unit as systemunit, t4.from_regist from
+        (select t1.id, t1.name, t1.description, t1.group_version, t1.app_id, t2.sensor_code from da_config_group t1
+        left join da_config_sensor_group t2 on t1.id = t2.group_id
+        where app_id in
+        (select extension_app_id from da_config_app_extension where app_id = #{appId,jdbcType=BIGINT} union all select
+        #{appId,jdbcType=BIGINT} from dual)
+        ) t3 left join da_config_sensor t4 on t3.sensor_code = t4.siecode
+    </select>
+
+    <!--根据appId修改其与继承其的所有app版本号-->
+    <update id="updateAppVersionByAppId" parameterType="java.util.Map">
+        update da_config_application set app_version = #{appVersion,jdbcType=BIGINT}
+        where id in
+        (select app_id from da_config_app_extension where extension_app_id = #{appId,jdbcType=BIGINT} union all select
+        #{appId,jdbcType=BIGINT} from dual)
+    </update>
+
+    <!--根据groupId列表修改group版本号-->
+    <update id="updateGroupVersionByGroupIdList" parameterType="java.util.Map">
+        update da_config_group set group_version = #{groupVersion,jdbcType=BIGINT}
+        where id in
+        (<foreach collection="groupIdList" item="groupId" index="index" separator=",">
+        #{groupId,jdbcType=BIGINT}
+        </foreach>)
+    </update>
+
+    <!--根据globalAppId查询自己和继承它的所有测点组-->
+    <select id="selectSensorGroupByGlobalAppId" resultType="com.siemens.dasheng.web.model.dto.DaConfigGroupDTO"
+            parameterType="java.lang.String">
+        select dcg.id,dcg.name,dcg.description from da_config_group dcg
+        where dcg.app_id in (select id from da_config_application where global_app_id = #{globalAppId}
+        union all
+        select dcae.extension_app_id as id from da_config_app_extension dcae
+        inner join da_config_application dca on dcae.app_id = dca.id
+        where dca.global_app_id = #{globalAppId})
+    </select>
+
+    <!--根据groupId查询测点-->
+    <select id="selectSensorByGroupId" resultType="com.siemens.dasheng.web.model.dto.DaConfigSensorDTO"
+            parameterType="java.lang.Long">
+        select dcs.siecode,dcs.unit from da_config_group dcg
+        inner join da_config_sensor_group dcsg on dcg.id = dcsg.group_id
+        inner join da_config_sensor dcs on dcsg.sensor_code = dcs.siecode
+        where dcg.id = #{groupId}
+    </select>
+</mapper>

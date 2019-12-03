@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.siemens.dasheng.web.mapper.DaConfigSensorMapper">
+  <resultMap id="BaseResultMap" type="com.siemens.dasheng.web.model.DaConfigSensor">
+    <constructor>
+      <idArg column="siecode" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="connector_id" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="tag" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="app_id" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="status" javaType="java.lang.Long" jdbcType="BIGINT" />
+      <arg column="description" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="unit" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="from_regist" javaType="java.lang.Integer" jdbcType="SMALLINT" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List">
+    siecode, connector_id, tag, app_id, status, description, unit, from_regist
+  </sql>
+
+  <select id="selectBySiecodes" resultType="com.siemens.dasheng.web.model.DaConfigSensor">
+    select siecode, connector_id as connectorId, tag, app_id as appId, status, description, unit, from_regist from da_config_sensor
+    where siecode in
+    (<foreach collection="siecodes" item="siecode" index="index" separator=",">
+    #{siecode}
+  </foreach>)
+  </select>
+
+  <select id="selectAllSensorList" resultType="com.siemens.dasheng.web.model.DaConfigSensor">
+    select siecode, connector_id as connectorId, tag, app_id as appId, status, description, unit, from_regist from da_config_sensor
+    where 1 = 1
+  </select>
+
+  <update id="updateStatusToDelByCondition">
+    update da_config_sensor set status = 2 where connector_id = #{connectorId} and
+    tag in
+    (<foreach collection="tagList" item="tag" index="index" separator=",">
+        #{tag}
+     </foreach>)
+    <if test="applicationIds != null and applicationIds.size>0">
+    and app_id in
+    (<foreach collection="applicationIds" item="applicationId" index="index" separator=",">
+    #{applicationId}
+  </foreach>)
+    </if>
+  </update>
+
+  <update id="updateStatusToImportedByCondition">
+    update da_config_sensor set status = 1 where connector_id = #{connectorId} and
+    tag in
+    (<foreach collection="tagList" item="tag" index="index" separator=",">
+    #{tag}
+  </foreach>)
+  </update>
+
+  <select id="selectCountByCondition" resultType="int">
+    select count(*) from da_config_sensor a
+    left join da_config_connector b on b.id = a.connector_id
+    where 1=1
+
+    <if test = "status != null and status != 3 ">
+      and a.status = #{status}
+    </if>
+    <if test = "searchContent != null and searchContent != ''">
+      and (upper(a.tag) like  ('%'||upper(#{searchContent})||'%') escape '/' or upper(b.db_name)  like  ('%'||upper(#{searchContent})||'%') escape '/' or upper(a.siecode)  like  ('%'||upper(#{searchContent})||'%') escape '/')
+    </if>
+    and a.app_id in
+    (<foreach collection="extendAppIds" item="appId" index="index" separator=",">
+    #{appId}
+  </foreach>)
+  </select>
+
+  <select id="selectAvailableSensorListByAppId" resultType="com.siemens.dasheng.web.model.DaConfigSensorPlus" parameterType="java.lang.Long">
+    select a.siecode,a.connector_id as connectorId, a.tag ,a.status,a.app_id as appId,a.description ,a.unit, a.from_regist as fromRegist
+    from da_config_sensor a where app_id in
+    (select #{appId} from dual union all select extension_app_id  from da_config_app_extension where app_id = #{appId})
+  </select>
+
+  <select id="selectListByConditionPG" resultType="com.siemens.dasheng.web.model.DaConfigSensorPlus">
+    select a.siecode,a.connector_id as connectorId, a.tag ,a.status,a.app_id as appId,a.description ,a.unit, a.from_regist as fromRegist,b.name as connectorName,b.db_name as dbName,c.type as scope,c.ff_app_id as ffAppId
+    from da_config_sensor a
+    left join da_config_connector b on b.id = a.connector_id
+    left join da_config_application c on c.id = a.app_id
+    where 1=1
+
+    <if test = "status != null and status != 3 ">
+      and a.status = #{status}
+    </if>
+    <if test = "searchContent != null and searchContent != ''">
+      and (upper(a.tag) like  ('%'||upper(#{searchContent})||'%') escape '/' or upper(b.db_name)  like  ('%'||upper(#{searchContent})||'%') escape '/' or upper(a.siecode)  like  ('%'||upper(#{searchContent})||'%') escape '/')
+    </if>
+    and a.app_id in
+    (<foreach collection="extendAppIds" item="appId" index="index" separator=",">
+    #{appId}
+  </foreach>)
+    order by a.siecode desc
+    offset #{start} limit #{pageNum}
+  </select>
+
+  <select id="selectListByConditionORAC" resultType="com.siemens.dasheng.web.model.DaConfigSensorPlus">
+    select * from (select A.*,rownum rn from ( select a.siecode,a.connector_id as connectorId, a.tag ,a.status,a.app_id as appId,a.description ,a.unit,a.from_regist as fromRegist,b.name as connectorName,b.db_name as dbName,c.type as scope,c.ff_app_id as ffAppId
+    from da_config_sensor a
+    left join da_config_connector b on b.id = a.connector_id
+    left join da_config_application c on c.id = a.app_id
+    where 1=1
+
+    <if test = "status != null and status != 3 ">
+      and a.status = #{status}
+    </if>
+    <if test = "searchContent != null and searchContent != ''">
+      and (upper(a.tag) like  ('%'||upper(#{searchContent})||'%') escape '/' or upper(b.db_name)  like  ('%'||upper(#{searchContent})||'%') escape '/' or upper(a.siecode)  like  ('%'||upper(#{searchContent})||'%') escape '/')
+    </if>
+    and a.app_id in
+    (<foreach collection="extendAppIds" item="appId" index="index" separator=",">
+    #{appId}
+  </foreach>)
+    order by a.siecode desc
+    ) A where rownum &lt;= #{pageNum}+#{start}) where rn > #{start}
+  </select>
+
+  <select id="selectByConnectorIds" resultType="com.siemens.dasheng.web.model.DaConfigSensor">
+    select siecode,connector_id as connectorId, tag ,status,app_id as appId,description ,unit from da_config_sensor where connector_id in
+    (<foreach collection="connectorIds" item="connectorId" index="index" separator=",">
+    #{connectorId}
+  </foreach>)
+    and app_id in
+    (<foreach collection="appIds" item="appId" index="index" separator=",">
+    #{appId}
+  </foreach>)
+  </select>
+
+
+  <insert id="saveListOracle" parameterType="java.util.List">
+    INSERT INTO da_config_sensor(siecode,connector_id,tag,app_id,status,description,unit,from_regist)
+    <foreach collection="list" item="item" index="index" separator="union all">
+      (SELECT #{item.siecode,jdbcType=VARCHAR}, #{item.connectorId,jdbcType=BIGINT},
+      #{item.tag,jdbcType=VARCHAR},#{item.appId,jdbcType=BIGINT},#{item.status,jdbcType=BIGINT},#{item.description,jdbcType=VARCHAR},#{item.unit,jdbcType=VARCHAR},#{item.fromRegist,jdbcType=SMALLINT} FROM DUAL)
+    </foreach>
+  </insert>
+
+
+  <select id="selectListByConnectorIdAndSiecode" resultType="com.siemens.dasheng.web.model.DaConfigSensor">
+        select a.connector_id as connectorId, a.tag from da_config_sensor a
+        where a.connector_id = #{connectorId} and a.app_id = #{applicationId} and a.tag = #{tag}
+    </select>
+
+  <delete id="deleteBatchByConnectorId">
+    delete from da_config_sensor where connector_id = #{connectorId} and
+    tag in
+    (<foreach collection="tagList" item="tag" index="index" separator=",">
+        #{tag}
+    </foreach>)
+  </delete>
+
+
+</mapper>
